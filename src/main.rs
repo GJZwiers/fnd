@@ -160,12 +160,8 @@ fn main() {
     let fixed_income_r = format!("{:.2}", total_income - flex_income);
     let fixed_charges_r = format!("{:.2}", total_expenses - flex_charges);
 
-    println!(
-        "in: {total_income} ({fixed_income_r} fixed, {flex_income} flexible)",
-    );
-    println!(
-        "out: {total_expenses} ({fixed_charges_r} fixed {flex_charges} flexible)"
-    );
+    println!("in: {total_income} ({fixed_income_r} fixed, {flex_income} flexible)",);
+    println!("out: {total_expenses} ({fixed_charges_r} fixed {flex_charges} flexible)");
     println!("{} moved", total_transfers);
     println!("{free_r} free");
     println!("{} total savings\n", savings.total);
@@ -174,8 +170,6 @@ fn main() {
         let ten_year_interest = saving.amount + saving.compound_interest;
         let ten_r = format!("{:.2}", ten_year_interest);
 
-        println!(
-            "{}: {} (10 yr: {ten_r})", saving.name, saving.amount
-        );
+        println!("{}: {} (10 yr: {ten_r})", saving.name, saving.amount);
     });
 }
