@@ -1,12 +1,13 @@
 use serde_derive::Deserialize;
+use std::ffi::OsStr;
 use std::format;
 use std::fs;
+use std::io::Result;
 
 #[derive(Deserialize, Debug)]
 struct Item {
-    name: String,
     amount: f32,
-    adjustable: Option<bool>,
+    flex: Option<bool>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -40,13 +41,12 @@ struct Account {
 }
 
 #[derive(Deserialize, Debug)]
-struct Monthly {
-    months: Vec<MonthlyExpense>,
+struct VariableExpenses {
+    expenses: Vec<MonthlyExpense>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 struct MonthlyExpense {
-    name: String,
     amounts: Vec<f32>,
 }
 
@@ -60,7 +60,7 @@ fn map_items(items: Vec<Item>) -> Sums {
     let sum = items
         .iter()
         .map(|v| {
-            if v.adjustable.is_some() {
+            if v.flex.is_some() {
                 flex += v.amount
             }
             v.amount
@@ -74,9 +74,9 @@ fn calculate_compound_interest(principal: f32, rate: f32, t: u32) -> f32 {
     principal * ((1. + rate).powf(t as f32)) - principal
 }
 
-fn main() {
-    let toml_str = fs::read_to_string("./expenses.toml").unwrap();
-    let expenses: Expenses = toml::from_str(toml_str.as_str()).unwrap();
+fn main() -> Result<()> {
+    let toml_str = fs::read_to_string("./expenses.toml")?;
+    let expenses: Expenses = toml::from_str(toml_str.as_str())?;
 
     let Sums {
         total: mut total_expenses,
@@ -91,31 +91,29 @@ fn main() {
         ..
     } = map_items(expenses.transfers.transfers);
 
-    fs::read_dir("varying").unwrap().for_each(|entry| {
-        let path = entry.unwrap().path();
-        let p = path.to_str().unwrap();
-
-        if !p.ends_with(".toml") {
-            let f = format!(
-                "Invalid filename '{}'. Filenames must have .toml extension",
-                p
+    for entry in fs::read_dir("variable")? {
+        let path = entry?.path();
+        if path.is_dir() {
+            println!("Found a directory in the 'varying' folder; skipping..");
+        } else if path.extension() != Some(OsStr::new("toml")) {
+            panic!(
+                "Invalid filename '{:?}'. Filenames must have .toml extension",
+                path
             );
-            panic!("{}", f)
         }
 
-        let file = fs::read_to_string(path).unwrap();
-        let monthly: Monthly = toml::from_str(file.as_str()).unwrap();
-
-        let len = monthly.months.len();
-        let sum = monthly
-            .months
+        let file = fs::read_to_string(path)?;
+        let var_expenses: VariableExpenses = toml::from_str(file.as_str())?;
+        let expense_count = var_expenses.expenses.len() as f32;
+        let expense_sum = var_expenses
+            .expenses
             .into_iter()
             .flat_map(|v| v.amounts)
             .sum::<f32>();
 
-        let avg = sum / len as f32;
+        let avg = expense_sum / expense_count;
         total_expenses += avg;
-    });
+    }
 
     let total_savings = expenses
         .savings
@@ -129,29 +127,35 @@ fn main() {
         if account.interest != 0.0 {
             let compound_interest =
                 calculate_compound_interest(account.amount, account.interest, 10);
-            let tyi = format!("{:.2}", account.amount + compound_interest);
-            let tyi_str = format!("{}: {} (10 yr: {tyi})", account.name, account.amount);
-            ten_year_interests.push(tyi_str);
+            let tyi = format!(
+                "{}: {} (10 yr: {:.2})",
+                account.name,
+                account.amount,
+                account.amount + compound_interest
+            );
+            ten_year_interests.push(tyi);
         }
     });
 
-    let free_r = format!("{:.2}", total_income - total_expenses - total_transfers);
-    let fixed_income_r = format!("{:.2}", total_income - flex_income);
-    let fixed_charges_r = format!("{:.2}", total_expenses - flex_charges);
+    let free_income = format!("{:.2}", total_income - total_expenses - total_transfers);
+    let fixed_income = format!("{:.2}", total_income - flex_income);
+    let fixed_charges = format!("{:.2}", total_expenses - flex_charges);
 
     println!(
         "in: {} ({} fixed, {} flexible)",
-        total_income, fixed_income_r, flex_income
+        total_income, fixed_income, flex_income
     );
     println!(
-        "out: {} ({} fixed {} flexible)",
-        total_expenses, fixed_charges_r, flex_charges
+        "out: {:.2} ({} fixed {} flexible)",
+        total_expenses, fixed_charges, flex_charges
     );
     println!("{} moved", total_transfers);
-    println!("{} free", free_r);
+    println!("{} free", free_income);
     println!("{} total savings\n", total_savings);
 
     ten_year_interests.iter().for_each(|tyi| {
         println!("{}", tyi);
     });
+
+    Ok(())
 }
