@@ -146,8 +146,10 @@ fn main() -> Result<()> {
         total_income, fixed_income, flex_income
     );
     println!(
-        "out: {} ({} fixed {} flexible)",
-        format!("{:.2}", total_expenses), fixed_charges, flex_charges
+        "out: {:.2} ({} fixed {} flexible)",
+        total_expenses,
+        fixed_charges,
+        flex_charges
     );
     println!("{} moved", total_transfers);
     println!("{} free", free_income);
