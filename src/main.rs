@@ -10,18 +10,6 @@ struct Item {
 }
 
 #[derive(Deserialize, Debug)]
-struct Saving {
-    name: String,
-    amount: f32,
-    interest: f32,
-}
-
-#[derive(Deserialize, Debug)]
-struct Savings {
-    accounts: Vec<Saving>,
-}
-
-#[derive(Deserialize, Debug)]
 struct Transactions {
     fixed: Vec<Item>,
 }
@@ -40,6 +28,18 @@ struct Expenses {
 }
 
 #[derive(Deserialize, Debug)]
+struct Savings {
+    accounts: Vec<Account>,
+}
+
+#[derive(Deserialize, Debug)]
+struct Account {
+    name: String,
+    amount: f32,
+    interest: f32,
+}
+
+#[derive(Deserialize, Debug)]
 struct Monthly {
     months: Vec<MonthlyExpense>,
 }
@@ -52,7 +52,6 @@ struct MonthlyExpense {
 
 struct Sums {
     total: f32,
-    //fixed: f32,
     flex: f32,
 }
 
@@ -71,40 +70,6 @@ fn map_items(items: Vec<Item>) -> Sums {
     Sums { total: sum, flex }
 }
 
-struct SavingInfo {
-    amount: f32,
-    compound_interest: f32,
-    name: String,
-}
-
-struct SavingsOut {
-    total: f32,
-    savings: Vec<SavingInfo>,
-}
-
-fn map_saving(savings: Vec<Saving>) -> SavingsOut {
-    let mut total: f32 = 0.0;
-    let mut vings = vec![];
-
-    savings.iter().for_each(|s| {
-        total += s.amount;
-        let mut compound_interest: f32 = 0.0;
-        if s.interest != 0.0 {
-            compound_interest = calculate_compound_interest(s.amount, s.interest, 10)
-        }
-        vings.push(SavingInfo {
-            amount: s.amount,
-            compound_interest,
-            name: s.name.clone(),
-        })
-    });
-
-    SavingsOut {
-        total,
-        savings: vings,
-    }
-}
-
 fn calculate_compound_interest(principal: f32, rate: f32, t: u32) -> f32 {
     principal * ((1. + rate).powf(t as f32)) - principal
 }
@@ -115,12 +80,10 @@ fn main() {
 
     let Sums {
         total: mut total_expenses,
-        //fixed: fixed_charges,
         flex: flex_charges,
     } = map_items(expenses.charges.fixed);
     let Sums {
         total: total_income,
-        //fixed: fixed_income,
         flex: flex_income,
     } = map_items(expenses.income.fixed);
     let Sums {
@@ -154,22 +117,41 @@ fn main() {
         total_expenses += avg;
     });
 
-    let savings = map_saving(expenses.savings.accounts);
+    let total_savings = expenses
+        .savings
+        .accounts
+        .iter()
+        .map(|account| account.amount)
+        .sum::<f32>();
+
+    let mut ten_year_interests: Vec<String> = vec![];
+    expenses.savings.accounts.iter().for_each(|account| {
+        if account.interest != 0.0 {
+            let compound_interest =
+                calculate_compound_interest(account.amount, account.interest, 10);
+            let tyi = format!("{:.2}", account.amount + compound_interest);
+            let tyi_str = format!("{}: {} (10 yr: {tyi})", account.name, account.amount);
+            ten_year_interests.push(tyi_str);
+        }
+    });
 
     let free_r = format!("{:.2}", total_income - total_expenses - total_transfers);
     let fixed_income_r = format!("{:.2}", total_income - flex_income);
     let fixed_charges_r = format!("{:.2}", total_expenses - flex_charges);
 
-    println!("in: {total_income} ({fixed_income_r} fixed, {flex_income} flexible)",);
-    println!("out: {total_expenses} ({fixed_charges_r} fixed {flex_charges} flexible)");
+    println!(
+        "in: {} ({} fixed, {} flexible)",
+        total_income, fixed_income_r, flex_income
+    );
+    println!(
+        "out: {} ({} fixed {} flexible)",
+        total_expenses, fixed_charges_r, flex_charges
+    );
     println!("{} moved", total_transfers);
-    println!("{free_r} free");
-    println!("{} total savings\n", savings.total);
+    println!("{} free", free_r);
+    println!("{} total savings\n", total_savings);
 
-    savings.savings.iter().for_each(|saving| {
-        let ten_year_interest = saving.amount + saving.compound_interest;
-        let ten_r = format!("{:.2}", ten_year_interest);
-
-        println!("{}: {} (10 yr: {ten_r})", saving.name, saving.amount);
+    ten_year_interests.iter().for_each(|tyi| {
+        println!("{}", tyi);
     });
 }
