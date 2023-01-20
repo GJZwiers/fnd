@@ -123,7 +123,7 @@ fn main() {
         .iter()
         .map(|account| account.amount)
         .sum::<f32>();
-    
+
     let mut ten_year_interests: Vec<String> = vec![];
     expenses.savings.accounts.iter().for_each(|account| {
         if account.interest != 0.0 {
