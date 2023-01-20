@@ -1,6 +1,6 @@
-use std::fs;
-use std::format;
 use serde_derive::Deserialize;
+use std::format;
+use std::fs;
 
 #[derive(Deserialize, Debug)]
 struct Item {
@@ -34,7 +34,7 @@ struct Transfers {
 #[derive(Deserialize, Debug)]
 struct Expenses {
     charges: Transactions,
-    income: Transactions, 
+    income: Transactions,
     savings: Savings,
     transfers: Transfers,
 }
@@ -47,7 +47,7 @@ struct Monthly {
 #[derive(Deserialize, Debug, Clone)]
 struct MonthlyExpense {
     name: String,
-    amounts: Vec<f32>
+    amounts: Vec<f32>,
 }
 
 struct Sums {
@@ -67,8 +67,8 @@ fn map_items(items: Vec<Item>) -> Sums {
             v.amount
         })
         .sum::<f32>();
-    
-    Sums { total: sum, flex, }
+
+    Sums { total: sum, flex }
 }
 
 struct SavingInfo {
@@ -79,7 +79,7 @@ struct SavingInfo {
 
 struct SavingsOut {
     total: f32,
-    savings: Vec<SavingInfo>
+    savings: Vec<SavingInfo>,
 }
 
 fn map_saving(savings: Vec<Saving>) -> SavingsOut {
@@ -90,11 +90,7 @@ fn map_saving(savings: Vec<Saving>) -> SavingsOut {
         total += s.amount;
         let mut compound_interest: f32 = 0.0;
         if s.interest != 0.0 {
-            compound_interest = calculate_compound_interest(
-                s.amount, 
-                s.interest, 
-                10
-            )
+            compound_interest = calculate_compound_interest(s.amount, s.interest, 10)
         }
         vings.push(SavingInfo {
             amount: s.amount,
@@ -103,7 +99,10 @@ fn map_saving(savings: Vec<Saving>) -> SavingsOut {
         })
     });
 
-    SavingsOut{ total, savings: vings }
+    SavingsOut {
+        total,
+        savings: vings,
+    }
 }
 
 fn calculate_compound_interest(principal: f32, rate: f32, t: u32) -> f32 {
@@ -114,17 +113,17 @@ fn main() {
     let toml_str = fs::read_to_string("./expenses.toml").unwrap();
     let expenses: Expenses = toml::from_str(toml_str.as_str()).unwrap();
 
-    let Sums { 
+    let Sums {
         total: mut total_expenses,
         //fixed: fixed_charges,
-        flex: flex_charges 
+        flex: flex_charges,
     } = map_items(expenses.charges.fixed);
-    let Sums { 
-        total: total_income, 
+    let Sums {
+        total: total_income,
         //fixed: fixed_income,
-        flex: flex_income 
+        flex: flex_income,
     } = map_items(expenses.income.fixed);
-    let Sums { 
+    let Sums {
         total: total_transfers,
         ..
     } = map_items(expenses.transfers.transfers);
@@ -134,7 +133,10 @@ fn main() {
         let p = path.to_str().unwrap();
 
         if !p.ends_with(".toml") {
-            let f = format!("Invalid filename '{}'. Filenames must have .toml extension", p);
+            let f = format!(
+                "Invalid filename '{}'. Filenames must have .toml extension",
+                p
+            );
             panic!("{}", f)
         }
 
@@ -142,7 +144,8 @@ fn main() {
         let monthly: Monthly = toml::from_str(file.as_str()).unwrap();
 
         let len = monthly.months.len();
-        let sum = monthly.months
+        let sum = monthly
+            .months
             .into_iter()
             .flat_map(|v| v.amounts)
             .sum::<f32>();
@@ -155,14 +158,16 @@ fn main() {
 
     let free_r = format!("{:.2}", total_income - total_expenses - total_transfers);
     let fixed_income_r = format!("{:.2}", total_income - flex_income);
-    let fixed_charges_r = format!("{:.2}",  total_expenses - flex_charges);
+    let fixed_charges_r = format!("{:.2}", total_expenses - flex_charges);
 
-    println!("{}", format!(
-        "in: {total_income} ({fixed_income_r} fixed, {flex_income} flexible)"
-    ));
-    println!("{}", format!(
-        "out: {total_expenses} ({fixed_charges_r} fixed {flex_charges} flexible)"
-    ));
+    println!(
+        "{}",
+        format!("in: {total_income} ({fixed_income_r} fixed, {flex_income} flexible)")
+    );
+    println!(
+        "{}",
+        format!("out: {total_expenses} ({fixed_charges_r} fixed {flex_charges} flexible)")
+    );
     println!("{}", format!("{} moved", total_transfers));
     println!("{}", format!("{free_r} free"));
     println!("{}", format!("{} total savings\n", savings.total));
@@ -171,6 +176,9 @@ fn main() {
         let ten_year_interest = saving.amount + saving.compound_interest;
         let ten_r = format!("{:.2}", ten_year_interest);
 
-        println!("{}", format!("{}: {} (10 yr: {ten_r})", saving.name, saving.amount));
+        println!(
+            "{}",
+            format!("{}: {} (10 yr: {ten_r})", saving.name, saving.amount)
+        );
     });
 }
