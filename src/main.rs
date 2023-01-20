@@ -147,9 +147,7 @@ fn main() -> Result<()> {
     );
     println!(
         "out: {:.2} ({} fixed {} flexible)",
-        total_expenses,
-        fixed_charges,
-        flex_charges
+        total_expenses, fixed_charges, flex_charges
     );
     println!("{} moved", total_transfers);
     println!("{} free", free_income);
