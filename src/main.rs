@@ -11,33 +11,18 @@ struct Item {
 }
 
 #[derive(Deserialize, Debug)]
-struct Transactions {
-    fixed: Vec<Item>,
-}
-
-#[derive(Deserialize, Debug)]
-struct Transfers {
-    transfers: Vec<Item>,
+struct Account {
+    amount: f32,
+    name: String,
+    interest: f32,
 }
 
 #[derive(Deserialize, Debug)]
 struct Expenses {
-    charges: Transactions,
-    income: Transactions,
-    savings: Savings,
-    transfers: Transfers,
-}
-
-#[derive(Deserialize, Debug)]
-struct Savings {
+    charges: Vec<Item>,
+    income: Vec<Item>,
     accounts: Vec<Account>,
-}
-
-#[derive(Deserialize, Debug)]
-struct Account {
-    name: String,
-    amount: f32,
-    interest: f32,
+    transfers: Vec<Item>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -75,21 +60,21 @@ fn calculate_compound_interest(principal: f32, rate: f32, t: u32) -> f32 {
 }
 
 fn main() -> Result<()> {
-    let toml_str = fs::read_to_string("./expenses.toml")?;
+    let toml_str = fs::read_to_string("./transactions.toml")?;
     let expenses: Expenses = toml::from_str(toml_str.as_str())?;
 
     let Sums {
         total: mut total_expenses,
         flex: flex_charges,
-    } = map_items(expenses.charges.fixed);
+    } = map_items(expenses.charges);
     let Sums {
         total: total_income,
         flex: flex_income,
-    } = map_items(expenses.income.fixed);
+    } = map_items(expenses.income);
     let Sums {
         total: total_transfers,
         ..
-    } = map_items(expenses.transfers.transfers);
+    } = map_items(expenses.transfers);
 
     for entry in fs::read_dir("variable")? {
         let path = entry?.path();
@@ -116,24 +101,23 @@ fn main() -> Result<()> {
     }
 
     let total_savings = expenses
-        .savings
         .accounts
         .iter()
         .map(|account| account.amount)
         .sum::<f32>();
 
     let mut ten_year_interests: Vec<String> = vec![];
-    expenses.savings.accounts.iter().for_each(|account| {
+    expenses.accounts.iter().for_each(|account| {
         if account.interest != 0.0 {
             let compound_interest =
                 calculate_compound_interest(account.amount, account.interest, 10);
-            let tyi = format!(
+            let ten_year_interest = format!(
                 "{}: {} (10 yr: {:.2})",
                 account.name,
                 account.amount,
                 account.amount + compound_interest
             );
-            ten_year_interests.push(tyi);
+            ten_year_interests.push(ten_year_interest);
         }
     });
 
