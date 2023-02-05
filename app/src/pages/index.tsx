@@ -8,12 +8,18 @@ import gold from "../assets/gold.svg";
 import { Table, useAsyncList, useCollator } from "@nextui-org/react";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [payment, setName] = useState("");
+  const [rowName, setRowName] = useState("");
+  const [row, setRow] = useState("");
 
-  async function addEarning() {
+  async function addRow() {
+    rows.push({
+      key: "0",
+      transaction_type: "in",
+      description: "foo",
+      amount: "0",
+    })
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { payment }));
+    setRowName(await invoke("add_row", { row }));
   }
 
   const rows = [
@@ -126,16 +132,16 @@ function App() {
         <div>
           <input
             id="row-input"
-            onChange={(e) => setName(e.currentTarget.value)}
+            onChange={(e) => setRow(e.currentTarget.value)}
             placeholder="new"
           />
-          <button type="button" onClick={() => addEarning()}>
+          <button type="button" onClick={() => addRow()}>
             Add
           </button>
         </div>
       </div>
 
-      <p>{greetMsg}</p>
+      <p>{rowName}</p>
     </div>
   );
 }
