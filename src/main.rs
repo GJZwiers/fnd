@@ -87,8 +87,8 @@ fn main() -> Result<()> {
             );
         }
 
-        let file = fs::read_to_string(path)?;
-        let var_expenses: VariableExpenses = toml::from_str(file.as_str())?;
+        let var_expenses: VariableExpenses =
+            toml::from_str(fs::read_to_string(path)?.as_str())?;
         let expense_count = var_expenses.expenses.len() as f32;
         let expense_sum = var_expenses
             .expenses
@@ -108,37 +108,28 @@ fn main() -> Result<()> {
 
     let mut ten_year_interests: Vec<String> = vec![];
     expenses.accounts.iter().for_each(|account| {
-        if account.interest != 0.0 {
-            let compound_interest =
-                calculate_compound_interest(account.amount, account.interest, 10);
-            let ten_year_interest = format!(
-                "{}: {} (10 yr: {:.2})",
-                account.name,
-                account.amount,
-                account.amount + compound_interest
-            );
-            ten_year_interests.push(ten_year_interest);
-        }
+        let compound_interest =
+            calculate_compound_interest(account.amount, account.interest, 10);
+        let ten_year_interest = format!(
+            "{}: {} (10 yr: {:.2})",
+            account.name,
+            account.amount,
+            account.amount + compound_interest
+        );
+        ten_year_interests.push(ten_year_interest);
     });
 
-    let free_income = format!("{:.2}", total_income - total_expenses - total_transfers);
-    let fixed_income = format!("{:.2}", total_income - flex_income);
-    let fixed_charges = format!("{:.2}", total_expenses - flex_charges);
+    let free_income =
+        format!("{:.2}", total_income - total_expenses - total_transfers);
 
-    println!(
-        "in: {} ({} fixed, {} flexible)",
-        total_income, fixed_income, flex_income
-    );
-    println!(
-        "out: {:.2} ({} fixed {} flexible)",
-        total_expenses, fixed_charges, flex_charges
-    );
+    println!("{} in ({} flexible)", total_income, flex_income);
+    println!("{:.2} out ({} flexible)", total_expenses, flex_charges);
     println!("{} moved", total_transfers);
     println!("{} free", free_income);
     println!("{} total savings\n", total_savings);
 
-    ten_year_interests.iter().for_each(|tyi| {
-        println!("{}", tyi);
+    ten_year_interests.iter().for_each(|ten_year_interest| {
+        println!("{}", ten_year_interest);
     });
 
     Ok(())
