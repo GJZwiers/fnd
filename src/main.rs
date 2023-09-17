@@ -47,11 +47,11 @@ fn map_items(items: Vec<Item>) -> Sums {
     let mut flex = 0.0;
     let sum = items
         .iter()
-        .map(|v| {
-            if v.flex.is_some() && v.flex.unwrap() == true {
-                flex += v.amount
+        .map(|item| {
+            if item.flex.is_some() && item.flex.unwrap() == true {
+                flex += item.amount
             }
-            v.amount
+            item.amount
         })
         .sum::<f32>();
 
@@ -165,4 +165,57 @@ fn main() -> Result<()> {
     });
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_map_items_sums_amounts() {
+        let sums = map_items(vec![
+            Item {
+                amount: 1.0,
+                flex: None,
+            },
+            Item {
+                amount: 1.0,
+                flex: None,
+            },
+        ]);
+        assert_eq!(sums.total, 2.0);
+        assert_eq!(sums.flex, 0.0);
+    }
+
+    #[test]
+    fn test_map_items_flex_true() {
+        let sums = map_items(vec![
+            Item {
+                amount: 1.0,
+                flex: Some(true),
+            },
+            Item {
+                amount: 1.0,
+                flex: None,
+            },
+        ]);
+        assert_eq!(sums.total, 2.0);
+        assert_eq!(sums.flex, 1.0);
+    }
+
+    #[test]
+    fn test_map_items_flex_false() {
+        let sums = map_items(vec![
+            Item {
+                amount: 1.0,
+                flex: Some(false),
+            },
+            Item {
+                amount: 1.0,
+                flex: None,
+            },
+        ]);
+        assert_eq!(sums.total, 2.0);
+        assert_eq!(sums.flex, 0.0);
+    }
 }
