@@ -27,7 +27,7 @@ accounts = [
 ]
 ```
 
-If there are expenses that vary from month to month, you can create a folder `variable` and add `.toml` files with any name. if an expense occurs a few times a month, e.g. groceries, you can add the indivual amounts to a list. The program will calculate an average amount over all the months and apply this in the expenses overview.
+If there are one-time expenses or expenses that vary from month to month, like groceries, you can create a folder `variable` and add `.toml` files with any name. The program will calculate an average amount over all the months and apply this in the expenses overview.
 
 `groceries.toml`:
 
@@ -47,3 +47,5 @@ expenses = [
     ]}
 ]
 ```
+
+If the program is run with the `--month={month}` argument only the one-time expenses for that month will be used.
