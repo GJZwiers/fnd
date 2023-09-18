@@ -1,7 +1,7 @@
 use std::{ffi::OsStr, fs, path::PathBuf};
 
 use regex::Regex;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct Item {
@@ -39,7 +39,7 @@ pub fn read_var_expenses(
     args: Vec<String>,
 ) -> Result<Vec<f32>, std::io::Error> {
     let mut avgs: Vec<f32> = vec![];
-    match fs::read_dir("variable") {
+    match fs::read_dir("src/variable") {
         Err(e) => {
             eprintln!("'variable' dir not found: {}", e)
         }

@@ -1,3 +1,4 @@
 /target
 /variable
 transactions.toml
+app/src-tauri/src/variable/

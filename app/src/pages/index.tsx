@@ -1,24 +1,34 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import Image from "next/image";
-import scale from "../assets/scale.svg";
-import quill from "../assets/quill.svg";
-import gold from "../assets/gold.svg";
-
-import { Table, useAsyncList, useCollator } from "@nextui-org/react";
 
 function App() {
+  const [msg, setMsg] = useState("");
+  const [exp, setExpense] = useState("");
+
+  async function expense() {
+    setMsg(await invoke("expense", { exp }));
+  }
+
   return (
     <div className="container">
       <h2>Treasure Cove</h2>
 
-      <div className="row">
-        <div>
-          <span>One</span>
-          <br></br>
-          <span>Two</span>
-        </div>
-      </div>
+      <form
+        className="row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          expense();
+        }}
+      >
+        <input
+          id="greet-input"
+          onChange={(e) => setExpense(e.currentTarget.value)}
+          placeholder="Enter a name..."
+        />
+        <button type="submit">Greet</button>
+      </form>
+
+      <p>{msg}</p>
     </div>
   );
 }
