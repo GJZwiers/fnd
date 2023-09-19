@@ -12,10 +12,10 @@ use std::format;
 use std::fs;
 
 fn main() {
-  tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![read_transactions])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![read_transactions])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
 
 #[tauri::command]
@@ -69,5 +69,5 @@ fn read_transactions() -> Vec<String> {
             account.amount, account.name, account.interest
         ))
     });
-    data.into()
+    data
 }

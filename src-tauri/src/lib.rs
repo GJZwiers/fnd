@@ -19,7 +19,7 @@ pub fn map_items(items: Vec<Item>) -> Sums {
     let sum = items
         .iter()
         .map(|item| {
-            if item.flex.is_some() && item.flex.unwrap() == true {
+            if item.flex.is_some() && item.flex.unwrap() {
                 flex += item.amount
             }
             item.amount
@@ -119,7 +119,7 @@ pub struct Transactions {
     pub transfers: Vec<Item>,
 }
 
-pub fn total_savings(accounts: &Vec<Account>) -> f32 {
+pub fn total_savings(accounts: &[Account]) -> f32 {
     accounts.iter().map(|account| account.amount).sum::<f32>()
 }
 
