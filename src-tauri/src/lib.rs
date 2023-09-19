@@ -1,7 +1,7 @@
 use std::{ffi::OsStr, fs, path::PathBuf};
 
 use regex::Regex;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct Item {
@@ -19,7 +19,7 @@ pub fn map_items(items: Vec<Item>) -> Sums {
     let sum = items
         .iter()
         .map(|item| {
-            if item.flex.is_some() && item.flex.unwrap() == true {
+            if item.flex.is_some() && item.flex.unwrap() {
                 flex += item.amount
             }
             item.amount
@@ -39,7 +39,7 @@ pub fn read_var_expenses(
     args: Vec<String>,
 ) -> Result<Vec<f32>, std::io::Error> {
     let mut avgs: Vec<f32> = vec![];
-    match fs::read_dir("variable") {
+    match fs::read_dir("src/variable") {
         Err(e) => {
             eprintln!("'variable' dir not found: {}", e)
         }
@@ -119,7 +119,7 @@ pub struct Transactions {
     pub transfers: Vec<Item>,
 }
 
-pub fn total_savings(accounts: &Vec<Account>) -> f32 {
+pub fn total_savings(accounts: &[Account]) -> f32 {
     accounts.iter().map(|account| account.amount).sum::<f32>()
 }
 
