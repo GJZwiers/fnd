@@ -1,6 +1,6 @@
 /target
 /variable
-transactions.toml
 src-tauri/src/variable/
+transactions.toml
 node_modules/
 .next/

@@ -1,7 +1,22 @@
 use std::{ffi::OsStr, fs, path::PathBuf};
 
 use regex::Regex;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TableDataItem {
+    pub name: String,
+    pub total: String,
+    pub flex: String,
+    pub var: String,
+    pub interest: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TableData {
+    pub accounts: Vec<TableDataItem>,
+    pub transactions: Vec<TableDataItem>,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct Item {
