@@ -1,13 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use app::TableData;
-use app::TableDataItem;
 use app::map_items;
 use app::read_var_expenses;
 use app::ten_year_interests;
 use app::total_savings;
 use app::Sums;
+use app::TableData;
+use app::TableDataItem;
 use app::Transactions;
 use std::env;
 use std::format;
@@ -49,13 +49,15 @@ fn read_transactions() -> TableData {
     } = map_items(transfers);
 
     let free_income =
-        format!("{:.2}", total_income - total_expenses - total_transfers).parse::<f32>().unwrap();
+        format!("{:.2}", total_income - total_expenses - total_transfers)
+            .parse::<f32>()
+            .unwrap();
 
     let accounts = ten_year_interests(&accounts);
     let total_savings = total_savings(&accounts);
 
     let rounded_income = format!("{:.2}", total_income);
-    let rounded_expenses = format!{"{:.2}", total_expenses};
+    let rounded_expenses = format! {"{:.2}", total_expenses};
     let rounded_flex_income = format!("{:.2}", flex_income);
     let rounded_flex_expense = format!("{:.2}", flex_expenses);
     let rounded_var_expenses = format!("{:.2}", var_expenses);
@@ -63,23 +65,57 @@ fn read_transactions() -> TableData {
     let rounded_free_income = format!("{:.2}", free_income);
 
     let table_rows = vec![
-        TableDataItem { name: "income".to_string(), total: rounded_income, flex: rounded_flex_income, var: "0.00".to_string(), interest: None },
-        TableDataItem { name: "expenses".to_string(), total: rounded_expenses, flex: rounded_flex_expense, var: rounded_var_expenses, interest: None },
-        TableDataItem { name: "transfers".to_string(), total: rounded_transfers, flex: "0.00".to_string(), var: "0.00".to_string(), interest: None },
-        TableDataItem { name: "free".to_string(), total: rounded_free_income, flex: "0.00".to_string(), var: "0.00".to_string(), interest: None }
+        TableDataItem {
+            name: "income".to_string(),
+            total: rounded_income,
+            flex: rounded_flex_income,
+            var: "0.00".to_string(),
+            interest: None,
+        },
+        TableDataItem {
+            name: "expenses".to_string(),
+            total: rounded_expenses,
+            flex: rounded_flex_expense,
+            var: rounded_var_expenses,
+            interest: None,
+        },
+        TableDataItem {
+            name: "transfers".to_string(),
+            total: rounded_transfers,
+            flex: "0.00".to_string(),
+            var: "0.00".to_string(),
+            interest: None,
+        },
+        TableDataItem {
+            name: "free".to_string(),
+            total: rounded_free_income,
+            flex: "0.00".to_string(),
+            var: "0.00".to_string(),
+            interest: None,
+        },
     ];
 
     let mut accs = vec![];
     accounts.iter().for_each(|account| {
-        accs.push(TableDataItem { name: account.name.clone(), total: format!("{:.2}", account.amount), interest: Some(format!("{:.2}", account.interest)), flex: "".to_string(), var: "".to_string()})
+        accs.push(TableDataItem {
+            name: account.name.clone(),
+            total: format!("{:.2}", account.amount),
+            interest: Some(format!("{:.2}", account.interest)),
+            flex: "".to_string(),
+            var: "".to_string(),
+        })
     });
 
-    accs.push(TableDataItem { name: "total savings".to_string(), total: format!("{:.2}", total_savings), flex: "-".to_string(), var: "-".to_string(), interest: None });
+    accs.push(TableDataItem {
+        name: "total savings".to_string(),
+        total: format!("{:.2}", total_savings),
+        flex: "-".to_string(),
+        var: "-".to_string(),
+        interest: None,
+    });
 
-    let table_data = TableData {
+    TableData {
         accounts: accs,
-        transactions: table_rows
-    };
-
-    table_data
+        transactions: table_rows,
+    }
 }
