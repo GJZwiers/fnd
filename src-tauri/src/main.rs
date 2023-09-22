@@ -5,6 +5,7 @@ use app::map_items;
 use app::read_var_expenses;
 use app::ten_year_interests;
 use app::total_savings;
+use app::ExpenseResponse;
 use app::Sums;
 use app::TableData;
 use app::TableDataItem;
@@ -15,9 +16,37 @@ use std::fs;
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![read_transactions])
+        .invoke_handler(tauri::generate_handler![
+            read_transactions,
+            get_expenses_from_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn get_expenses_from_file() -> Vec<ExpenseResponse> {
+    let toml_string = fs::read_to_string("src/transactions.toml").unwrap();
+    let Transactions { expenses, .. } =
+        toml::from_str(toml_string.as_str()).unwrap();
+
+    let response = expenses
+        .iter()
+        .map(|expense| {
+            let flex = if expense.flex.is_none() {
+                "false".to_string()
+            } else {
+                "true".to_string()
+            };
+            ExpenseResponse {
+                name: expense.name.clone(),
+                amount: format!("{:.2}", expense.amount),
+                flex,
+            }
+        })
+        .collect::<Vec<ExpenseResponse>>();
+
+    response
 }
 
 #[tauri::command]
