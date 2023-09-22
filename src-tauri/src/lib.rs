@@ -18,10 +18,18 @@ pub struct TableData {
     pub transactions: Vec<TableDataItem>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Item {
+    pub name: String,
     pub amount: f32,
     pub flex: Option<bool>,
+}
+
+#[derive(Serialize)]
+pub struct ExpenseResponse {
+    pub name: String,
+    pub amount: String,
+    pub flex: String,
 }
 
 pub struct Sums {
@@ -168,10 +176,12 @@ mod tests {
     fn test_map_items_sums_amounts() {
         let sums = map_items(vec![
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: None,
             },
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: None,
             },
@@ -184,10 +194,12 @@ mod tests {
     fn test_map_items_flex_true() {
         let sums = map_items(vec![
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: Some(true),
             },
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: None,
             },
@@ -200,10 +212,12 @@ mod tests {
     fn test_map_items_flex_false() {
         let sums = map_items(vec![
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: Some(false),
             },
             Item {
+                name: "foo".to_string(),
                 amount: 1.0,
                 flex: None,
             },

@@ -7,7 +7,7 @@ interface TableDataItem {
   name: string,
   total: string,
   flex: string,
-  var: string,
+  var: string,  
   interest?: string
 }
 
@@ -23,11 +23,9 @@ export default function Transactions() {
     useEffect(() => {
         invoke<TableData>('read_transactions')
             .then((tableData) => {
-                console.log(tableData)
                 setTransactions(tableData.transactions)
                 setAccounts(tableData.accounts)
             })
-
             .catch(console.error)
     }, [])
 
@@ -100,4 +98,3 @@ export default function Transactions() {
     </div>
   );
 };
- 
