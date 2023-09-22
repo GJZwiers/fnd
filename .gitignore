@@ -2,5 +2,6 @@
 /variable
 src-tauri/src/variable/
 transactions.toml
-node_modules/
-.next/
+/node_modules
+/.next
+next-env.d.ts
