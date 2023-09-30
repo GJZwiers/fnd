@@ -3,6 +3,10 @@ use std::{ffi::OsStr, fs, path::PathBuf};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
+pub mod db;
+pub mod models;
+pub mod schema;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TableDataItem {
     pub name: String,
@@ -18,7 +22,7 @@ pub struct TableData {
     pub transactions: Vec<TableDataItem>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Item {
     pub name: String,
     pub amount: f32,
@@ -126,7 +130,7 @@ pub fn avg_var_expense(
     Ok(expense_sum / expense_count)
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Account {
     pub amount: f32,
     pub name: String,
@@ -134,7 +138,7 @@ pub struct Account {
     pub interest: f32,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Transactions {
     pub expenses: Vec<Item>,
     pub income: Vec<Item>,

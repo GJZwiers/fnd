@@ -1,11 +1,16 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod db;
+
 use app::map_items;
+use app::models::Expense;
+use app::models::NewExpense;
 use app::read_var_expenses;
 use app::ten_year_interests;
 use app::total_savings;
 use app::ExpenseResponse;
+use app::Item;
 use app::Sums;
 use app::TableData;
 use app::TableDataItem;
@@ -14,15 +19,95 @@ use std::env;
 use std::format;
 use std::fs;
 
+use diesel::prelude::*;
+
+use db::establish_db_connection;
+
 fn main() {
     tauri::Builder::default()
+        .setup(|_app| {
+            db::init();
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             read_transactions,
-            get_expenses_from_file
+            get_expenses_from_file,
+            write_new_expense,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+// #[tauri::command]
+// fn load_expenses() {
+//     use app::schema::expenses::dsl::*;
+
+//     let conn = &mut establish_db_connection();
+
+//     let results = expenses
+//         //.filter(flexible.eq(false))
+//         .limit(25)
+//         .select(Expense::as_select())
+//         .load(conn)
+//         .expect("Error loading expenses");
+
+//     println!("Displaying {} expenses", results.len());
+//     for expense in results {
+//         println!("{}", expense.name);
+//         println!("-----------\n");
+//         println!("amount {}", expense.amount);
+//         println!("flex {}\n", expense.flexible);
+//     }
+// }
+
+#[tauri::command]
+fn write_new_expense(expense: Item) {
+    use app::schema::expenses;
+
+    let flex = expense.flex.is_some();
+
+    let new_expense = NewExpense {
+        name: expense.name,
+        amount: expense.amount,
+        flexible: flex,
+    };
+
+    let conn = &mut establish_db_connection();
+
+    diesel::insert_into(expenses::table)
+        .values(&new_expense)
+        .returning(Expense::as_returning())
+        .get_result(conn)
+        .expect("Error saving new expense");
+}
+
+// #[tauri::command]
+// fn update_expense(id: i32) {
+//     use app::schema::expenses::dsl::{expenses, flexible};
+
+//     let conn = &mut establish_db_connection();
+
+//     let expense = diesel::update(expenses.find(id))
+//         .set(flexible.eq(true))
+//         .returning(Expense::as_returning())
+//         .get_result(conn)
+//         .unwrap();
+//     println!("Updated expense {}", expense.name);
+// }
+
+// #[tauri::command]
+// fn delete_expense(pattern: String) {
+//     use app::schema::expenses::dsl::*;
+
+//     let conn = &mut establish_db_connection();
+
+//     let num_deleted = diesel::delete(expenses.filter(name.like(pattern)))
+//         .execute(conn)
+//         .expect("Error deleting posts");
+
+//     println!("Deleted {} expenses", num_deleted);
+// }
 
 #[tauri::command]
 fn get_expenses_from_file() -> Vec<ExpenseResponse> {

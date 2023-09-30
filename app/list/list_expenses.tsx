@@ -20,7 +20,7 @@ export default function Expenses() {
 
   return (
     <div>
-      <div className="flex justify-center">
+      <div className="flex justify-center font-bold text-gray-700">
         <h1>Expenses</h1>
       </div>
 
