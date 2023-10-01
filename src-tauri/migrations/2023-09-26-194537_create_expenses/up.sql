@@ -1,0 +1,6 @@
+CREATE TABLE expenses (
+  id INTEGER NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  amount REAL NOT NULL,
+  flexible BOOLEAN NOT NULL DEFAULT 0
+)
