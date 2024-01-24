@@ -9,7 +9,6 @@ use app::models::NewExpense;
 use app::read_var_expenses;
 use app::ten_year_interests;
 use app::total_savings;
-use app::ExpenseResponse;
 use app::Item;
 use app::Sums;
 use app::TableData;
@@ -32,40 +31,32 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             read_transactions,
-            get_expenses_from_file,
             write_new_expense,
+            load_expenses,
+            update_expense
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-// #[tauri::command]
-// fn load_expenses() {
-//     use app::schema::expenses::dsl::*;
+#[tauri::command]
+fn load_expenses() -> Vec<Expense> {
+    use app::schema::expenses::dsl::*;
 
-//     let conn = &mut establish_db_connection();
+    let conn = &mut establish_db_connection();
 
-//     let results = expenses
-//         //.filter(flexible.eq(false))
-//         .limit(25)
-//         .select(Expense::as_select())
-//         .load(conn)
-//         .expect("Error loading expenses");
-
-//     println!("Displaying {} expenses", results.len());
-//     for expense in results {
-//         println!("{}", expense.name);
-//         println!("-----------\n");
-//         println!("amount {}", expense.amount);
-//         println!("flex {}\n", expense.flexible);
-//     }
-// }
+    expenses
+        .limit(50)
+        .select(Expense::as_select())
+        .load(conn)
+        .expect("Error loading expenses")
+}
 
 #[tauri::command]
 fn write_new_expense(expense: Item) {
     use app::schema::expenses;
 
-    let flex = expense.flex.is_some();
+    let flex = expense.flex.unwrap();
 
     let new_expense = NewExpense {
         name: expense.name,
@@ -75,6 +66,7 @@ fn write_new_expense(expense: Item) {
 
     let conn = &mut establish_db_connection();
 
+    // TODO: validation, check for duplicate entries
     diesel::insert_into(expenses::table)
         .values(&new_expense)
         .returning(Expense::as_returning())
@@ -82,19 +74,20 @@ fn write_new_expense(expense: Item) {
         .expect("Error saving new expense");
 }
 
-// #[tauri::command]
-// fn update_expense(id: i32) {
-//     use app::schema::expenses::dsl::{expenses, flexible};
+#[tauri::command]
+fn update_expense(id: i32, new_name: String) {
+    use app::schema::expenses::dsl::{expenses, name};
 
-//     let conn = &mut establish_db_connection();
+    let conn = &mut establish_db_connection();
 
-//     let expense = diesel::update(expenses.find(id))
-//         .set(flexible.eq(true))
-//         .returning(Expense::as_returning())
-//         .get_result(conn)
-//         .unwrap();
-//     println!("Updated expense {}", expense.name);
-// }
+    let expense = diesel::update(expenses.find(id))
+        .set(name.eq(new_name))
+        .returning(Expense::as_returning())
+        .get_result(conn)
+        .unwrap();
+
+    println!("Updated expense name {}", expense.name);
+}
 
 // #[tauri::command]
 // fn delete_expense(pattern: String) {
@@ -108,31 +101,6 @@ fn write_new_expense(expense: Item) {
 
 //     println!("Deleted {} expenses", num_deleted);
 // }
-
-#[tauri::command]
-fn get_expenses_from_file() -> Vec<ExpenseResponse> {
-    let toml_string = fs::read_to_string("src/transactions.toml").unwrap();
-    let Transactions { expenses, .. } =
-        toml::from_str(toml_string.as_str()).unwrap();
-
-    let response = expenses
-        .iter()
-        .map(|expense| {
-            let flex = if expense.flex.is_none() {
-                "false".to_string()
-            } else {
-                "true".to_string()
-            };
-            ExpenseResponse {
-                name: expense.name.clone(),
-                amount: format!("{:.2}", expense.amount),
-                flex,
-            }
-        })
-        .collect::<Vec<ExpenseResponse>>();
-
-    response
-}
 
 #[tauri::command]
 fn read_transactions() -> TableData {
@@ -185,6 +153,8 @@ fn read_transactions() -> TableData {
             flex: rounded_flex_income,
             var: "0.00".to_string(),
             interest: None,
+            interest_yr: None,
+            payments: None,
         },
         TableDataItem {
             name: "expenses".to_string(),
@@ -192,6 +162,8 @@ fn read_transactions() -> TableData {
             flex: rounded_flex_expense,
             var: rounded_var_expenses,
             interest: None,
+            interest_yr: None,
+            payments: None,
         },
         TableDataItem {
             name: "transfers".to_string(),
@@ -199,6 +171,8 @@ fn read_transactions() -> TableData {
             flex: "0.00".to_string(),
             var: "0.00".to_string(),
             interest: None,
+            interest_yr: None,
+            payments: None,
         },
         TableDataItem {
             name: "free".to_string(),
@@ -206,6 +180,8 @@ fn read_transactions() -> TableData {
             flex: "0.00".to_string(),
             var: "0.00".to_string(),
             interest: None,
+            interest_yr: None,
+            payments: None,
         },
     ];
 
@@ -215,6 +191,8 @@ fn read_transactions() -> TableData {
             name: account.name.clone(),
             total: format!("{:.2}", account.amount),
             interest: Some(format!("{:.2}", account.interest)),
+            payments: Some(account.payments.to_string()),
+            interest_yr: Some(account.interest_yr.to_string()),
             flex: "".to_string(),
             var: "".to_string(),
         })
@@ -225,7 +203,9 @@ fn read_transactions() -> TableData {
         total: format!("{:.2}", total_savings),
         flex: "-".to_string(),
         var: "-".to_string(),
+        payments: None,
         interest: None,
+        interest_yr: None,
     });
 
     TableData {

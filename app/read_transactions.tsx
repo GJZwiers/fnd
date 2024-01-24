@@ -8,7 +8,9 @@ interface TableDataItem {
   total: string,
   flex: string,
   var: string,  
-  interest?: string
+  interest?: string,
+  payments: string,
+  interest_yr?: string
 }
 
 interface TableData {
@@ -74,7 +76,8 @@ export default function Transactions() {
                     <tr>
                       <th scope="col" className="px-6 py-4">Account</th>
                       <th scope="col" className="px-6 py-4">Amount</th>
-                      <th scope="col" className="px-6 py-4">Interest 10 yr</th>
+                      <th scope="col" className="px-6 py-4">Interest</th>
+                      <th scope="col" className="px-6 py-4">Interest with Payments</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -83,7 +86,8 @@ export default function Transactions() {
                         <tr key={i} className="border-b dark:border-neutral-500">
                         <td className="whitespace-nowrap px-6 py-4 font-medium">{v.name}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.total}</td>
-                        <td className="whitespace-nowrap px-6 py-4">{v.interest}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{v.interest} {v.interest_yr ? "(" + v.interest_yr + "y)" : undefined}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{v.payments}</td>
                         </tr>
                       ))
                     }
