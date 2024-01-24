@@ -115,7 +115,7 @@ pub fn avg_var_expense(
         .flat_map(|v| {
             if args.len() > 1 {
                 let re = Regex::new(
-                    r"=(?<month>jan|feb|mar|apr|jun|jul|aug|sep|okt|nov|dev)",
+                    r"=(?<month>jan|feb|mar|apr|jun|jul|aug|sep|okt|nov|dec)",
                 )
                 .unwrap();
                 let caps = re.captures(args[1].as_str()).unwrap();
