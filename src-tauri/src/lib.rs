@@ -107,7 +107,7 @@ pub fn avg_var_expense(
         }
         .as_str(),
     )?;
-    println!("{:?}", args);
+
     let expense_count = var_expenses.out.len() as f32;
     let expense_sum = var_expenses
         .out
