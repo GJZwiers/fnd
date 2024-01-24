@@ -151,7 +151,6 @@ pub struct AccountResult {
     pub deposit: f32,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Transactions {
     pub expenses: Vec<Item>,
@@ -169,15 +168,21 @@ pub fn ten_year_interests(accounts: &Vec<Account>) -> Vec<AccountResult> {
         Vec::with_capacity(accounts.len());
 
     accounts.iter().for_each(|account| {
-        let compound_interest =
-            calculate_compound_deposits(account.amount, account.deposit, account.interest, account.interest_yr);
-            //calculate_compound_interest(account.amount, account.interest, account.interest_yr);
+        let compound_interest = calculate_compound_deposits(
+            account.amount,
+            account.deposit,
+            account.interest,
+            account.interest_yr,
+        );
+        //calculate_compound_interest(account.amount, account.interest, account.interest_yr);
 
         let ten_year_interest = AccountResult {
             name: account.name.clone(),
             amount: account.amount,
             interest: account.amount + compound_interest.f1,
-            payments: account.amount + compound_interest.f1 + compound_interest.f2,
+            payments: account.amount
+                + compound_interest.f1
+                + compound_interest.f2,
             interest_yr: account.interest_yr,
             deposit: account.deposit,
         };
@@ -197,14 +202,18 @@ pub struct InterestObject {
 
 // A = PMT * (((1 + r)t - 1) / r) * (1 + r)
 // A = PMT * (((1 + r/n)n*t -1) / (r/n)) * (1 + r/n)
-pub fn calculate_compound_deposits(principal: f32, pmt: f32, rate: f32, t: u32) -> InterestObject {
+pub fn calculate_compound_deposits(
+    principal: f32,
+    pmt: f32,
+    rate: f32,
+    t: u32,
+) -> InterestObject {
     let n = 12 as f32;
     let f1 = principal * ((1. + rate).powf(t as f32)) - principal;
-    let f2 = pmt * (((1. + rate / n).powf(n * t as f32) - 1.) / (rate/n)) * (1. + (rate/n));
-    InterestObject {
-        f1,
-        f2,
-    }
+    let f2 = pmt
+        * (((1. + rate / n).powf(n * t as f32) - 1.) / (rate / n))
+        * (1. + (rate / n));
+    InterestObject { f1, f2 }
     // f1 + f2
 }
 

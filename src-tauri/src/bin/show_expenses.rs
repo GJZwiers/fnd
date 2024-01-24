@@ -1,7 +1,7 @@
 use self::models::*;
-use diesel::prelude::*;
 use app::*;
 use db::establish_db_connection;
+use diesel::prelude::*;
 
 fn main() {
     use self::schema::expenses::dsl::*;
