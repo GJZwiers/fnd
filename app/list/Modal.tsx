@@ -1,6 +1,13 @@
+import { ReactNode } from "react";
 import classes from "./Modal.module.css";
 
-function Modal({ children, onClose }) {
+function Modal({
+  children,
+  onClose,
+}: {
+  children: ReactNode;
+  onClose: () => void;
+}) {
   return (
     <>
       <div className={classes.backdrop} onClick={onClose} />

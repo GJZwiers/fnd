@@ -4,8 +4,19 @@ import Modal from "./Modal";
 import { useState, useEffect } from "react";
 import classes from "./ExpenseList.module.css";
 
-function ExpenseList({ isPosting, onStopPosting }) {
-  const [posts, setPosts] = useState([]);
+type Expense = {
+  body: string,
+  name: string,
+}
+
+function ExpenseList({
+  isPosting,
+  onStopPosting,
+}: {
+  isPosting: boolean;
+  onStopPosting: () => void;
+}) {
+  const [posts, setPosts] = useState<Expense[]>([]);
 
   // useEffect(() => {
   //   async function fetchPosts() {
@@ -17,8 +28,8 @@ function ExpenseList({ isPosting, onStopPosting }) {
   //   fetchPosts();
   // }, []);
 
-  function addExpenseHandler(postData) {
-    console.log(postData)
+  function addExpenseHandler(postData: { name: string; body: string }) {
+    console.log(postData);
     // fetch('http://localhost:8080/posts', {
     //   method: 'POST',
     //   body: JSON.stringify(postData),
@@ -33,7 +44,10 @@ function ExpenseList({ isPosting, onStopPosting }) {
     <>
       {isPosting && (
         <Modal onClose={onStopPosting}>
-          <NewExpense onCancel={onStopPosting} onAddExpense={addExpenseHandler} />
+          <NewExpense
+            onCancel={onStopPosting}
+            onAddExpense={addExpenseHandler}
+          />
         </Modal>
       )}
       {posts.length > 0 && (
