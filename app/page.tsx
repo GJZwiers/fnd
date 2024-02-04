@@ -1,6 +1,7 @@
 'use client'
 
 import Transactions from './read_transactions'
+import Link from 'next/link'
 
 export default function Home() {
   function handleClick() {
@@ -9,7 +10,8 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-white">
-      <button className="text-blue-600" onClick={handleClick}>Expense List</button>
+      <Link href="/list" className="text-blue-600">Expense List</Link>
+      {/* <button  onClick={handleClick}>Expense List</button> */}
       <Transactions />
     </main>
   )

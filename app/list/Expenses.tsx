@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 
 export interface Expense {
-  id: string,
+  id: string;
   name: string;
   amount: string;
 }
 
 // Get the expenses from the database on first page load, with a form to add a new expense. The state is updated on form submit.
-export default function Expenses() {
+function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function Expenses() {
       const expenses = await invoke<Expense[]>("load_expenses");
       setExpenses(expenses);
     }
-    
+
     loadExpenses();
   }, []);
 
@@ -46,17 +46,6 @@ export default function Expenses() {
         setExpenses(updated_expenses);
       })
       .catch(console.error);
-  }
-
-  function handleTableClick(e: React.FocusEvent<HTMLTableCellElement>) {
-    // console.log(e.target.innerHTML);
-    if (e.target.id === "name") {     
-      
-    } else if (e.target.id === "amount") {
-
-    }
-    
-    console.log("clicked table cell!")
   }
 
   return (
@@ -152,13 +141,16 @@ export default function Expenses() {
                           key={i}
                           className="border-b dark:border-neutral-500"
                         >
-                          <td className="whitespace-nowrap px-6 py-4 font-medium" > 
+                          <td className="whitespace-nowrap px-6 py-4 font-medium">
                             {v.id}
                           </td>
-                          <td className="whitespace-nowrap px-6 py-4 font-medium" onBlur={handleTableClick}>
+                          <td className="whitespace-nowrap px-6 py-4 font-medium">
                             {v.name}
                           </td>
-                          <td className="whitespace-nowrap px-6 py-4" suppressContentEditableWarning={true}>
+                          <td
+                            className="whitespace-nowrap px-6 py-4"
+                            suppressContentEditableWarning={true}
+                          >
                             {v.amount}
                           </td>
                         </tr>
@@ -174,3 +166,5 @@ export default function Expenses() {
     </div>
   );
 }
+
+export default Expenses;
