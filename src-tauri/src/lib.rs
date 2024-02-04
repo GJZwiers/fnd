@@ -41,12 +41,7 @@ pub struct Sums {
 }
 
 pub fn map_items(items: Vec<Item>) -> Sums {
-    let sum = items
-        .iter()
-        .map(|item| {
-            item.amount
-        })
-        .sum::<f32>();
+    let sum = items.iter().map(|item| item.amount).sum::<f32>();
 
     Sums { total: sum }
 }
