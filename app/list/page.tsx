@@ -17,10 +17,6 @@ export default function Page() {
     setModalIsVisible(false);
   }
 
-  function handleClick() {
-    window.location.href = "/";
-  }
-
   return (
     <main>
       <Link href="/" className="text-blue-600">Overview</Link>
@@ -31,8 +27,4 @@ export default function Page() {
       />
     </main>
   );
-}
-
-{
-  /* <button className="text-blue-600" onClick={handleClick}>Home</button> */
 }
