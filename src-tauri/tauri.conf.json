@@ -55,10 +55,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 768,
         "resizable": true,
-        "title": "main",
-        "width": 800
+        "title": "fnd",
+        "width": 1024
       }
     ]
   }

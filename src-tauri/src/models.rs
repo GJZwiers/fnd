@@ -9,7 +9,6 @@ pub struct Expense {
     pub id: i32,
     pub name: String,
     pub amount: f32,
-    pub flexible: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Insertable)]
@@ -17,5 +16,4 @@ pub struct Expense {
 pub struct NewExpense {
     pub name: String,
     pub amount: f32,
-    pub flexible: bool,
 }
