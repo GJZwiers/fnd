@@ -1,19 +1,36 @@
-'use client'
+"use client";
 
-import Editable from "./Editable"
-import Expenses from "./expenses"
+import { useState } from "react";
+import ExpenseList from "./ExpenseList";
+import Expenses from "./Expenses";
+import MainHeader from "./MainHeader";
 
 export default function Page() {
+  const [modalIsVisible, setModalIsVisible] = useState(false);
+
+  function showModalHandler() {
+    setModalIsVisible(true);
+  }
+
+  function hideModalHandler() {
+    setModalIsVisible(false);
+  }
+
   function handleClick() {
-    window.location.href = "/"
+    window.location.href = "/";
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <button onClick={handleClick}>Home</button>
-      <div className="App">
-      </div>
-        <div><Editable /></div>
+    <main>
+      <MainHeader onCreateExpense={showModalHandler} />
+      <ExpenseList
+        isPosting={modalIsVisible}
+        onStopPosting={hideModalHandler}
+      />
     </main>
-  )
+  );
+}
+
+{
+  /* <button className="text-blue-600" onClick={handleClick}>Home</button> */
 }

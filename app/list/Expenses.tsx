@@ -5,7 +5,6 @@ export interface Expense {
   id: string,
   name: string;
   amount: string;
-  flexible: boolean;
 }
 
 // Get the expenses from the database on first page load, with a form to add a new expense. The state is updated on form submit.
@@ -13,11 +12,12 @@ export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
-    invoke<Expense[]>("load_expenses")
-      .then((expenses) => {
-        setExpenses(expenses);
-      })
-      .catch(console.error);
+    async function loadExpenses() {
+      const expenses = await invoke<Expense[]>("load_expenses");
+      setExpenses(expenses);
+    }
+    
+    loadExpenses();
   }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -32,7 +32,6 @@ export default function Expenses() {
         id: formProps.id as string,
         name: formProps.expenseName as string,
         amount: formProps.expenseAmount as string,
-        flexible: formProps.expenseFlexible === "true",
       },
     ];
 
@@ -40,7 +39,6 @@ export default function Expenses() {
       expense: {
         name: formProps.expenseName,
         amount: parseFloat(formProps.expenseAmount as string),
-        flex: formProps.expenseFlexible === "true",
       },
     })
       .then(() => {
@@ -55,8 +53,6 @@ export default function Expenses() {
     if (e.target.id === "name") {     
       
     } else if (e.target.id === "amount") {
-
-    } else if (e.target.id === "flexible") {
 
     }
     
@@ -112,26 +108,6 @@ export default function Expenses() {
             ></input>
           </div>
         </div>
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label
-              className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-              htmlFor="inline-flexible"
-            >
-              Flexible
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <select
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              name="expenseFlexible"
-              id="inline-flexible"
-            >
-              <option>true</option>
-              <option>false</option>
-            </select>
-          </div>
-        </div>
 
         <div className="md:flex md:items-center">
           <div className="md:w-1/3"></div>
@@ -168,9 +144,6 @@ export default function Expenses() {
                         <th scope="col" className="px-6 py-4">
                           Amount
                         </th>
-                        <th scope="col" className="px-6 py-4">
-                          Flexible
-                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -187,9 +160,6 @@ export default function Expenses() {
                           </td>
                           <td className="whitespace-nowrap px-6 py-4" suppressContentEditableWarning={true}>
                             {v.amount}
-                          </td>
-                          <td className="whitespace-nowrap px-6 py-4" >
-                            {v.flexible.toString()}
                           </td>
                         </tr>
                       ))}

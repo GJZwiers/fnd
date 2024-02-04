@@ -6,11 +6,11 @@ import { invoke } from '@tauri-apps/api/tauri'
 interface TableDataItem {
   name: string,
   total: string,
-  flex: string,
-  var: string,  
+  var: string,
+  interest_rate: string,
   interest?: string,
+  interest_yr?: string,
   payments: string,
-  interest_yr?: string
 }
 
 interface TableData {
@@ -44,21 +44,19 @@ export default function Transactions() {
               <div className="overflow-hidden">
                 
                 <table className="min-w-full text-left text-sm font-light">
-                  <thead className="border-b font-medium dark:border-neutral-500">
+                  <thead className="border-b font-light dark:border-neutral-500">
                     <tr>
                       <th scope="col" className="px-6 py-4">Type</th>
                       <th scope="col" className="px-6 py-4">Total</th>
-                      <th scope="col" className="px-6 py-4">Flexible</th>
                       <th scope="col" className="px-6 py-4">Variable</th>
                     </tr>
                   </thead>
                   <tbody>
                     {
                       transactions.map((v, i, a) => (
-                        <tr key={i} className="border-b dark:border-neutral-500">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">{v.name}</td>
+                        <tr key={i} className="border-b dark:border-neutral-500 ">
+                        <td className="whitespace-nowrap px-6 py-4 font-light">{v.name}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.total}</td>
-                        <td className="whitespace-nowrap px-6 py-4">{v.flex}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.var}</td>
                         </tr>
                       ))
@@ -68,24 +66,26 @@ export default function Transactions() {
 
                 <br></br>
                 <div className='flex justify-center'>
-                <h1>Savings Summary</h1>
+                <h1>Account Summary</h1>
                 </div>
 
                 <table className="min-w-full text-left text-sm font-light">
-                  <thead className="border-b font-medium dark:border-neutral-500">
+                  <thead className="border-b font-light dark:border-neutral-500">
                     <tr>
                       <th scope="col" className="px-6 py-4">Account</th>
-                      <th scope="col" className="px-6 py-4">Amount</th>
-                      <th scope="col" className="px-6 py-4">Interest</th>
-                      <th scope="col" className="px-6 py-4">Interest with Payments</th>
+                      <th scope="col" className="px-6 py-4">Principal Amount</th>
+                      <th scope="col" className="px-6 py-4">Interest Rate</th>
+                      <th scope="col" className="px-6 py-4">Amount After Interest</th>
+                      <th scope="col" className="px-6 py-4">After Interest and Deposits</th>
                     </tr>
                   </thead>
                   <tbody>
                     {
                       accounts.map((v, i, a) => (
                         <tr key={i} className="border-b dark:border-neutral-500">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">{v.name}</td>
+                        <td className="whitespace-nowrap px-6 py-4 font-light">{v.name}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.total}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{v.interest_rate}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.interest} {v.interest_yr ? "(" + v.interest_yr + "y)" : undefined}</td>
                         <td className="whitespace-nowrap px-6 py-4">{v.payments}</td>
                         </tr>
