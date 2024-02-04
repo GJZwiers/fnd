@@ -11,11 +11,11 @@ function NewExpense({
   const [expenseName, setExpenseName] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
 
-  function nameChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
+  function nameChangeHandler(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setExpenseName(event.target.value);
   }
 
-  function amountChangeHandler(event: React.ChangeEvent<HTMLTextAreaElement>) {
+  function amountChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
     setExpenseAmount(event.target.value);
   }
 
@@ -32,17 +32,17 @@ function NewExpense({
   return (
     <form className={classes.form} onSubmit={submitHandler}>
       <p>
-        <label htmlFor="amount">Amount</label>
+        <label htmlFor="name">Expense Name</label>
         <textarea
-          id="amount"
+          id="name"
           required
           rows={3}
-          onChange={amountChangeHandler}
+          onChange={nameChangeHandler}
         />
       </p>
       <p>
-        <label htmlFor="name">Expense name</label>
-        <input type="text" id="name" required onChange={nameChangeHandler} />
+        <label htmlFor="amount">Amount</label>
+        <input type="text" id="amount" required onChange={amountChangeHandler} />
       </p>
       <p className={classes.actions}>
         <button type="button" onClick={onCancel}>

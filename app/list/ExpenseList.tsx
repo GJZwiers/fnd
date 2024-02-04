@@ -22,7 +22,7 @@ function ExpenseList({
   //   async function fetchPosts() {
   //     const response = await fetch('http://localhost:8080/posts');
   //     const data = await response.json();
-  //     setPosts(data.posts);
+  //     setPosts(data.expenses);
   //   }
 
   //   fetchPosts();
@@ -51,7 +51,7 @@ function ExpenseList({
         </Modal>
       )}
       {posts.length > 0 && (
-        <ul className={classes.posts}>
+        <ul className={classes.expenses}>
           {posts.map((post) => (
             <Expense key={post.body} name={post.name} amount={post.body} />
           ))}
