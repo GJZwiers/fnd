@@ -56,12 +56,9 @@ fn load_expenses() -> Vec<Expense> {
 fn write_new_expense(expense: Item) {
     use app::schema::expenses;
 
-    let flex = expense.flex.unwrap();
-
     let new_expense = NewExpense {
         name: expense.name,
         amount: expense.amount,
-        flexible: flex,
     };
 
     let conn = &mut establish_db_connection();
@@ -115,7 +112,6 @@ fn read_transactions() -> TableData {
 
     let Sums {
         total: mut total_expenses,
-        flex: flex_expenses,
     } = map_items(expenses);
 
     let var_expenses = read_var_expenses(args).unwrap().iter().sum::<f32>();
@@ -123,7 +119,6 @@ fn read_transactions() -> TableData {
 
     let Sums {
         total: total_income,
-        flex: flex_income,
     } = map_items(income);
     let Sums {
         total: total_transfers,
@@ -140,8 +135,6 @@ fn read_transactions() -> TableData {
 
     let rounded_income = format!("{:.2}", total_income);
     let rounded_expenses = format! {"{:.2}", total_expenses};
-    let rounded_flex_income = format!("{:.2}", flex_income);
-    let rounded_flex_expense = format!("{:.2}", flex_expenses);
     let rounded_var_expenses = format!("{:.2}", var_expenses);
     let rounded_transfers = format!("{:.2}", total_transfers);
     let rounded_free_income = format!("{:.2}", free_income);
@@ -150,36 +143,36 @@ fn read_transactions() -> TableData {
         TableDataItem {
             name: "income".to_string(),
             total: rounded_income,
-            flex: rounded_flex_income,
             var: "0.00".to_string(),
             interest: None,
+            interest_rate: None,
             interest_yr: None,
             payments: None,
         },
         TableDataItem {
             name: "expenses".to_string(),
             total: rounded_expenses,
-            flex: rounded_flex_expense,
             var: rounded_var_expenses,
             interest: None,
+            interest_rate: None,
             interest_yr: None,
             payments: None,
         },
         TableDataItem {
             name: "transfers".to_string(),
             total: rounded_transfers,
-            flex: "0.00".to_string(),
             var: "0.00".to_string(),
             interest: None,
+            interest_rate: None,
             interest_yr: None,
             payments: None,
         },
         TableDataItem {
             name: "free".to_string(),
             total: rounded_free_income,
-            flex: "0.00".to_string(),
             var: "0.00".to_string(),
             interest: None,
+            interest_rate: None,
             interest_yr: None,
             payments: None,
         },
@@ -192,8 +185,8 @@ fn read_transactions() -> TableData {
             total: format!("{:.2}", account.amount),
             interest: Some(format!("{:.2}", account.interest)),
             payments: Some(account.payments.to_string()),
+            interest_rate: Some(account.interest_rate.to_string()),
             interest_yr: Some(account.interest_yr.to_string()),
-            flex: "".to_string(),
             var: "".to_string(),
         })
     });
@@ -201,10 +194,10 @@ fn read_transactions() -> TableData {
     accs.push(TableDataItem {
         name: "total savings".to_string(),
         total: format!("{:.2}", total_savings),
-        flex: "-".to_string(),
         var: "-".to_string(),
         payments: None,
         interest: None,
+        interest_rate: None,
         interest_yr: None,
     });
 

@@ -11,9 +11,9 @@ pub mod schema;
 pub struct TableDataItem {
     pub name: String,
     pub total: String,
-    pub flex: String,
     pub var: String,
     pub interest: Option<String>,
+    pub interest_rate: Option<String>,
     pub interest_yr: Option<String>,
     pub payments: Option<String>,
 }
@@ -28,34 +28,22 @@ pub struct TableData {
 pub struct Item {
     pub name: String,
     pub amount: f32,
-    pub flex: Option<bool>,
 }
 
 #[derive(Serialize)]
 pub struct ExpenseResponse {
     pub name: String,
     pub amount: String,
-    pub flex: String,
 }
 
 pub struct Sums {
     pub total: f32,
-    pub flex: f32,
 }
 
 pub fn map_items(items: Vec<Item>) -> Sums {
-    let mut flex = 0.;
-    let sum = items
-        .iter()
-        .map(|item| {
-            if item.flex.is_some() && item.flex.unwrap() {
-                flex += item.amount
-            }
-            item.amount
-        })
-        .sum::<f32>();
+    let sum = items.iter().map(|item| item.amount).sum::<f32>();
 
-    Sums { total: sum, flex }
+    Sums { total: sum }
 }
 
 #[derive(Deserialize, Debug)]
@@ -146,6 +134,7 @@ pub struct AccountResult {
     pub amount: f32,
     pub name: String,
     pub interest: f32,
+    pub interest_rate: f32,
     pub payments: f32,
     pub interest_yr: u32,
     pub deposit: f32,
@@ -179,6 +168,7 @@ pub fn ten_year_interests(accounts: &Vec<Account>) -> Vec<AccountResult> {
         let ten_year_interest = AccountResult {
             name: account.name.clone(),
             amount: account.amount,
+            interest_rate: account.interest,
             interest: account.amount + compound_interest.f1,
             payments: account.amount
                 + compound_interest.f1
@@ -230,16 +220,13 @@ mod tests {
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: None,
             },
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: None,
             },
         ]);
         assert_eq!(sums.total, 2.0);
-        assert_eq!(sums.flex, 0.0);
     }
 
     #[test]
@@ -248,16 +235,13 @@ mod tests {
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: Some(true),
             },
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: None,
             },
         ]);
         assert_eq!(sums.total, 2.0);
-        assert_eq!(sums.flex, 1.0);
     }
 
     #[test]
@@ -266,15 +250,12 @@ mod tests {
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: Some(false),
             },
             Item {
                 name: "foo".to_string(),
                 amount: 1.0,
-                flex: None,
             },
         ]);
         assert_eq!(sums.total, 2.0);
-        assert_eq!(sums.flex, 0.0);
     }
 }

@@ -1,0 +1,18 @@
+income = [
+    { name = "wages", amount = 2500 }
+]
+
+expenses = [
+    { name = "rent", amount = 750, required = true },
+    { name = "netflix", amount = 11.99 },
+]
+
+transfers = [
+    { name = "savings", amount = 300 },
+    { name = "investments", amount = 500 },
+]
+
+accounts = [
+    { name = "my savings account", amount = 5000, interest = 0.02, interest_yr = 5, deposit = 300 },
+    { name = "my investments account", amount = 2000, interest = 0.05, interest_yr = 10, deposit = 500 },
+]
