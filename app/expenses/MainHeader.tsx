@@ -1,6 +1,6 @@
-import classes from './MainHeader.module.css';
+import classes from "./MainHeader.module.css";
 
-function MainHeader({ onCreateExpense }) {
+function MainHeader({ onCreateExpense }: { onCreateExpense: () => void }) {
   return (
     <header className={classes.header}>
       <h1 className={classes.logo}>Expenses</h1>

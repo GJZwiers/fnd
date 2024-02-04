@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import ExpenseList from "./ExpenseList";
-import Expenses from "./Expenses";
 import MainHeader from "./MainHeader";
 import Link from "next/link";
 
@@ -19,7 +18,9 @@ export default function Page() {
 
   return (
     <main>
-      <Link href="/" className="text-blue-600">Overview</Link>
+      <Link href="/" className="text-blue-600">
+        Overview
+      </Link>
       <MainHeader onCreateExpense={showModalHandler} />
       <ExpenseList
         isPosting={modalIsVisible}

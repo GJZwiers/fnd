@@ -33,16 +33,16 @@ function NewExpense({
     <form className={classes.form} onSubmit={submitHandler}>
       <p>
         <label htmlFor="name">Expense Name</label>
-        <textarea
-          id="name"
-          required
-          rows={3}
-          onChange={nameChangeHandler}
-        />
+        <textarea id="name" required rows={3} onChange={nameChangeHandler} />
       </p>
       <p>
         <label htmlFor="amount">Amount</label>
-        <input type="text" id="amount" required onChange={amountChangeHandler} />
+        <input
+          type="text"
+          id="amount"
+          required
+          onChange={amountChangeHandler}
+        />
       </p>
       <p className={classes.actions}>
         <button type="button" onClick={onCancel}>

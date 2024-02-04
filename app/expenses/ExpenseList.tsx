@@ -1,13 +1,13 @@
 import NewExpense from "./NewExpense";
 import Expense from "./Expense";
 import Modal from "./Modal";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import classes from "./ExpenseList.module.css";
 
 type Expense = {
-  body: string,
-  name: string,
-}
+  body: string;
+  name: string;
+};
 
 function ExpenseList({
   isPosting,
@@ -18,25 +18,7 @@ function ExpenseList({
 }) {
   const [posts, setPosts] = useState<Expense[]>([]);
 
-  // useEffect(() => {
-  //   async function fetchPosts() {
-  //     const response = await fetch('http://localhost:8080/posts');
-  //     const data = await response.json();
-  //     setPosts(data.expenses);
-  //   }
-
-  //   fetchPosts();
-  // }, []);
-
   function addExpenseHandler(postData: { name: string; body: string }) {
-    console.log(postData);
-    // fetch('http://localhost:8080/posts', {
-    //   method: 'POST',
-    //   body: JSON.stringify(postData),
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // })
     setPosts((existingPosts) => [postData, ...existingPosts]);
   }
 
